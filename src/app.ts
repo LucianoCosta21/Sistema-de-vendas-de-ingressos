@@ -1,18 +1,8 @@
 import express from 'express';
-import * as mysql from 'mysql2/promise'
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 
-function createConnection(){
-  return mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'tickets',
-    port: 33060
-  
-  })
-}
+
 const app = express();
 
 app.use(express.json());
