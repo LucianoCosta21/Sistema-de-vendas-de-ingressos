@@ -1,19 +1,25 @@
-import bcrypt from "bcrypt";
-import { UserModel } from "../models/user-models";
-import jwt from "jsonwebtoken";
+import { EventModel } from "../models/event-model";
+import { TicketModel, TicketStatus } from "../models/ticket-model";
 
-export class AuthService {
-  async login(email:string, password: string){
-    const userModel = await UserModel.findByEmail(email);
-    if(userModel && bcrypt.compareSync(password, userModel.password)){
-      return jwt.sign({id: userModel.id, email: userModel.email},
-        "123456",{
-          expiresIn: "1h",
-        });
-    }else {
-      throw new InvalidCredentialsError();
+export class TicketService{
+  async createMany(data: {
+    eventId: number;
+    numTickets: number;
+    price: number;
+  }){
+    const event = await EventModel.findById(data.eventId)
+
+    if(!event){
+      throw new Error("Event not Found");
     }
+
+    const ticketsData =  Array(data.numTickets).fill({}).map((_, index) => ({
+      location: `Location ${index}`,
+      event_id: event.id,
+      price: data.price,
+      status: TicketStatus.available,
+    })); 
+
+    await TicketModel.createMany(ticketsData);
   }
 }
-
-export class InvalidCredentialsError extends Error{}
